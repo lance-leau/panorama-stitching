@@ -1,11 +1,12 @@
+import numpy as np
 from tqdm import tqdm
 
-from .blend_images import blend_images
+from .blend_images import blend_images, blend_multiple
 from .detect_points import detect_points
 from .estimate_homography import estimate_homography
 from .load_images import load_images, save_image
 from .match_points import match_points
-from .warp_images import full_warp
+from .warp_images import full_warp, warp_all_images
 
 
 def align_pair(base, image):
@@ -28,14 +29,44 @@ def merge_pair(base, image):
     return panorama, info
 
 
+def _build_absolute_homographies(pairwise_H, ref):
+    n = len(pairwise_H) + 1
+    abs_H = [None] * n
+    abs_H[ref] = np.eye(3, dtype=np.float64)
+    for i in range(ref - 1, -1, -1):
+        abs_H[i] = abs_H[i + 1] @ np.linalg.inv(pairwise_H[i])
+
+    for i in range(ref + 1, n):
+        abs_H[i] = abs_H[i - 1] @ pairwise_H[i - 1]
+
+    return abs_H
+
+
 def stitch_images(images):
-    if len(images) < 2:
+    n = len(images)
+    if n < 2:
         raise ValueError("il faut au moins deux images")
-    panorama = images[0]
+
+    if n == 2:
+        panorama, info = merge_pair(images[0], images[1])
+        return panorama, [info]
+    
+    pairwise_H = []
     infos = []
-    for image in tqdm(images[1:], desc="assemblage"):
-        panorama, info = merge_pair(panorama, image)
-        infos.append(info)
+    for i in tqdm(range(n - 1), desc="alignement"):
+        h, matches, inliers = align_pair(images[i], images[i + 1])
+        pairwise_H.append(h)
+        infos.append({
+            "matches": len(matches),
+            "inliers": int(inliers.sum()),
+            "inlier_ratio": float(inliers.mean()),
+        })
+
+    ref = n // 2
+    abs_H = _build_absolute_homographies(pairwise_H, ref)
+
+    warped = warp_all_images(images, abs_H)
+    panorama = blend_multiple(warped)
     return panorama, infos
 
 
