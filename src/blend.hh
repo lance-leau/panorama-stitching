@@ -7,7 +7,6 @@
 
 namespace panorama
 {
-
     cv::Mat blendImages(const std::vector<WarpedImage>& warpedImages);
 
 } // namespace panorama
