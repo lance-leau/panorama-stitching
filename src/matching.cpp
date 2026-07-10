@@ -2,10 +2,12 @@
 
 #include <stdexcept>
 
+#define kRatioThreshold 0.75F
+
 namespace panorama
 {
-
-    std::vector<cv::DMatch> matchFeatures(const Features&, const Features&)
+    std::vector<cv::DMatch> matchFeatures(const Features& first,
+                                          const Features& second)
     {
         cv::BFMatcher matcher(cv::NORM_L2);
 
@@ -23,7 +25,9 @@ namespace panorama
         }
 
         std::sort(goodMatches.begin(), goodMatches.end(),
-                  [](const cv::DMatch& a, const cv::DMatch& b) { return a.distance < b.distance; });
+                  [](const cv::DMatch& a, const cv::DMatch& b) {
+                      return a.distance < b.distance;
+                  });
 
         return goodMatches;
     }
