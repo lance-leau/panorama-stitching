@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from src.load_images import list_image_paths
-from src.pipeline import run_pipeline
+from srcPy.load_images import list_image_paths
+from srcPy.pipeline import run_pipeline
 
 
 def next_output_path():
