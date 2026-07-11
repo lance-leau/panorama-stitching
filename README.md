@@ -7,6 +7,8 @@ pip install -r requirements.txt
 Utilisation avec des images données dans l'ordre :
 
 ```bash
+Prototype python
+
 python main.py img1.jpg img2.jpg img3.jpg ...
 
 
@@ -24,7 +26,16 @@ Pour vérifier la cohérence du prototype avec la version cpp
 
 python verify_consisttency.py img1.jpg img2.jpg img3.jpg ...
 
+----------------------------------------------------------------
 
+Version C++
+Pour compiler et run le projet:
+
+make
+./bin/panorama img1.jpg img2.jpg img3.jpg ...
+
+Pour effectuer les tests :
+make test
 
 ```
 
