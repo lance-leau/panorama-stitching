@@ -8,8 +8,14 @@
 
 namespace panorama
 {
+    struct HomographyResult
+    {
+        cv::Mat homography;
+        std::vector<uint8_t> inliersMask;
+    };
 
-    cv::Mat estimateHomography(const Features& first, const Features& second,
-                               const std::vector<cv::DMatch>& matches);
+    HomographyResult estimateHomography(const Features& first,
+                                        const Features& second,
+                                        const std::vector<cv::DMatch>& matches);
 
 } // namespace panorama

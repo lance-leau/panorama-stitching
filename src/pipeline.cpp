@@ -46,7 +46,8 @@ namespace panorama
         if (n == 2)
         {
             auto matches = matchFeatures(features[0], features[1]);
-            cv::Mat H = estimateHomography(features[0], features[1], matches);
+            cv::Mat H = estimateHomography(features[0], features[1], matches)
+                            .homography;
             cv::Mat identity = cv::Mat::eye(3, 3, CV_64F);
 
             auto warped = warpImages({ images[0], images[1] }, { identity, H });
@@ -60,7 +61,8 @@ namespace panorama
             {
                 auto matches = matchFeatures(features[i], features[i + 1]);
                 pairwiseH.push_back(
-                    estimateHomography(features[i], features[i + 1], matches));
+                    estimateHomography(features[i], features[i + 1], matches)
+                        .homography);
             }
 
             int ref = n / 2;
