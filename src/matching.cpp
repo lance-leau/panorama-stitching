@@ -1,27 +1,81 @@
 #include "matching.hh"
 
+#include <algorithm>
+#include <cmath>
+#include <limits>
 #include <stdexcept>
-
-#define kRatioThreshold 0.75F
 
 namespace panorama
 {
+
+    constexpr float kRatioThreshold = 0.75f;
+
+    float l2Distance(const float* a, const float* b, int dims)
+    {
+        float sum = 0.0f;
+        for (int i = 0; i < dims; ++i)
+        {
+            const float diff = a[i] - b[i];
+            sum += diff * diff;
+        }
+        return std::sqrt(sum);
+    }
+
+    struct BestTwo
+    {
+        float bestDist = std::numeric_limits<float>::max();
+        int bestIdx = -1;
+        float secondDist = std::numeric_limits<float>::max();
+    };
+
+    BestTwo findTwoNearest(const float* query, const cv::Mat& targetDescriptors,
+                           int dims)
+    {
+        BestTwo result;
+
+        for (int j = 0; j < targetDescriptors.rows; ++j)
+        {
+            const float* candidate = targetDescriptors.ptr<float>(j);
+            const float dist = l2Distance(query, candidate, dims);
+
+            if (dist < result.bestDist)
+            {
+                result.secondDist = result.bestDist;
+                result.bestDist = dist;
+                result.bestIdx = j;
+            }
+            else if (dist < result.secondDist)
+            {
+                result.secondDist = dist;
+            }
+        }
+
+        return result;
+    }
+
     std::vector<cv::DMatch> matchFeatures(const Features& first,
                                           const Features& second)
     {
-        cv::BFMatcher matcher(cv::NORM_L2);
+        if (first.descriptors.empty() || second.descriptors.empty())
+            throw std::runtime_error("matchFeatures: descripteurs vides");
 
-        std::vector<std::vector<cv::DMatch>> rawMatches;
-        matcher.knnMatch(first.descriptors, second.descriptors, rawMatches, 2);
+        const int dims = first.descriptors.cols;
+        if (second.descriptors.cols != dims)
+            throw std::runtime_error(
+                "matchFeatures: dimensions de descripteurs incoherentes");
 
         std::vector<cv::DMatch> goodMatches;
-        for (const auto& pair : rawMatches)
+
+        for (int i = 0; i < first.descriptors.rows; ++i)
         {
-            if (pair.size() < 2)
+            const float* query = first.descriptors.ptr<float>(i);
+            BestTwo nearest = findTwoNearest(query, second.descriptors, dims);
+
+            if (nearest.bestIdx < 0)
                 continue;
 
-            if (pair[0].distance < kRatioThreshold * pair[1].distance)
-                goodMatches.push_back(pair[0]);
+            if (nearest.bestDist < kRatioThreshold * nearest.secondDist)
+                goodMatches.emplace_back(i, nearest.bestIdx, nearest.bestDist);
         }
 
         std::sort(goodMatches.begin(), goodMatches.end(),
