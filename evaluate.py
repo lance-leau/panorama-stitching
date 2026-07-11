@@ -47,4 +47,4 @@ if __name__ == "__main__":
         sys.exit(1)
     images = load_images(paths)
     for i in range(len(images) - 1):
-        evaluate_pair(images[i], images[i+1], f"{paths[i].name} → {paths[i+1].name}")
+        evaluate_pair(images[i], images[i+1], f"{paths[i].name} -> {paths[i+1].name}")

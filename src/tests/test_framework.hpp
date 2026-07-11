@@ -11,8 +11,8 @@ struct TestResult {
     std::string message;
 };
 
-static std::vector<TestResult> _results;
-static std::string _current_test;
+extern std::vector<TestResult> _results;
+extern std::string _current_test;
 
 #define TEST(name) \
     static void test_##name(); \

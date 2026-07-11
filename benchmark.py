@@ -1,7 +1,3 @@
-"""
-Comparaison de performances Python vs C++.
-Usage : python benchmark.py img1.jpg img2.jpg [img3.jpg ...]
-"""
 import sys
 import time
 import subprocess
@@ -41,15 +37,13 @@ def main():
 
     print(f"\nBenchmark sur {len(paths)} images\n")
 
-    t_py  = bench_python(paths)
-    t_cpp = bench_cpp(paths)
+    t_cpp  = bench_python(paths)
+    t_py = bench_cpp(paths)
 
     print(f"  Python : {t_py:.2f}s")
     if t_cpp:
         print(f"  C++    : {t_cpp:.2f}s")
         print(f"  Speedup: x{t_py / t_cpp:.1f}")
-    else:
-        print(f"  C++    : binaire introuvable — compilez d'abord avec 'make' dans cpp/")
 
 
 if __name__ == "__main__":

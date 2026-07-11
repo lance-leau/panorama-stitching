@@ -1,7 +1,7 @@
 #include "test_framework.hpp"
 
-// Les TEST() de chaque fichier s'enregistrent automatiquement via leurs variables statiques.
-// Ce main se contente de les exécuter tous.
+std::vector<TestResult> _results;
+std::string _current_test;
 
 int main() {
     return run_all_tests();

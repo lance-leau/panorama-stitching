@@ -30,7 +30,10 @@ TEST(warpImages_toutes_les_images_ont_le_meme_canvas) {
     };
     auto warped = panorama::warpImages(images, Hs);
     for (size_t i = 1; i < warped.size(); ++i)
-        ASSERT_EQ(warped[i].image.size(), warped[0].image.size());
+    {
+        ASSERT_EQ(warped[i].image.rows, warped[0].image.rows);
+        ASSERT_EQ(warped[i].image.cols, warped[0].image.cols);
+    }
 }
 
 TEST(warpImages_masques_non_vides) {
@@ -51,7 +54,6 @@ TEST(warpImages_canvas_assez_grand_pour_translation) {
         translation_H(180, 0),
     };
     auto warped = panorama::warpImages(images, Hs);
-    // Canvas doit contenir les deux images décalées de 180 px
     ASSERT_TRUE(warped[0].image.cols >= 380);
 }
 
@@ -73,5 +75,8 @@ TEST(warpImages_masque_et_image_meme_taille) {
     std::vector<cv::Mat> Hs = {cv::Mat::eye(3,3,CV_64F), translation_H(60,0)};
     auto warped = panorama::warpImages(images, Hs);
     for (auto& wi : warped)
-        ASSERT_EQ(wi.image.size(), wi.mask.size());
+    {
+        ASSERT_EQ(wi.image.rows, wi.mask.rows);
+        ASSERT_EQ(wi.image.cols, wi.mask.cols);
+    }
 }

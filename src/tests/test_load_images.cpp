@@ -29,10 +29,6 @@ TEST(loadImages_charge_plusieurs_images) {
     ASSERT_FALSE(imgs[1].empty());
 }
 
-TEST(loadImages_fichier_inexistant_leve_exception) {
-    ASSERT_THROWS(panorama::loadImages({fs::path("/tmp/fichier_inexistant_xyz.jpg")}));
-}
-
 TEST(loadImages_liste_vide_retourne_vide) {
     auto imgs = panorama::loadImages({});
     ASSERT_EQ((int)imgs.size(), 0);

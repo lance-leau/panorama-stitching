@@ -1,8 +1,3 @@
-"""
-Vérifie que Python et C++ produisent des homographies cohérentes
-sur les mêmes paires d'images.
-Usage : python verify_consistency.py img1.jpg img2.jpg [img3.jpg ...]
-"""
 import sys
 import subprocess
 import json
@@ -48,29 +43,25 @@ def main():
         label = f"{paths[i].name} → {paths[i+1].name}"
         H_py, inliers_py, matches_py = homography_python(images[i], images[i+1])
 
-        # --- Récupération de H_cpp via le binaire (dump JSON) ---
-        # En attendant l'implémentation C++, on compare les stats de matching
         print(f"  {label}")
         print(f"    Python : {matches_py} matches, {inliers_py} inliers")
 
-        # Vérification interne : H_py doit être inversible (det ≠ 0)
         det = np.linalg.det(H_py)
         ok = abs(det) > 1e-6
-        print(f"    det(H) = {det:.4f}  {'✓ inversible' if ok else '✗ singulière'}")
+        print(f"    det(H) = {det:.4f}  {' inversible' if ok else ' singulière'}")
 
-        # Vérification que H est bien une homographie normalisée (H[2,2] ≈ 1)
         h33 = H_py[2, 2]
         ok2 = abs(h33 - 1.0) < 0.05
-        print(f"    H[2,2] = {h33:.4f}  {'✓ normalisée' if ok2 else '✗ non normalisée'}")
+        print(f"    H[2,2] = {h33:.4f}  {' normalisée' if ok2 else ' non normalisée'}")
 
         if not (ok and ok2):
             all_ok = False
 
     print()
     if all_ok:
-        print("Résultat : toutes les homographies sont valides ✓")
+        print("Résultat : toutes les homographies sont valides")
     else:
-        print("Résultat : certaines homographies sont invalides ✗")
+        print("Résultat : certaines homographies sont invalides")
 
 
 if __name__ == "__main__":

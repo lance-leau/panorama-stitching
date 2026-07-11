@@ -7,7 +7,25 @@ pip install -r requirements.txt
 Utilisation avec des images données dans l'ordre :
 
 ```bash
-python main.py img1.jpg img2.jpg img3.jpg ... -o outputs/panorama.jpg
+python main.py img1.jpg img2.jpg img3.jpg ...
+
+
+Pour vérifier la qualité du prototype en fonction des critères choisis
+
+python evaluate.py img1.jpg img2.jpg img3.jpg ... 
+
+
+Pour effectuer un benchmark entre la version cpp et python
+
+python benchmark.py img1.jpg img2.jpg img3.jpg ...
+
+
+Pour vérifier la cohérence du prototype avec la version cpp
+
+python verify_consisttency.py img1.jpg img2.jpg img3.jpg ...
+
+
+
 ```
 
 ## Documents
