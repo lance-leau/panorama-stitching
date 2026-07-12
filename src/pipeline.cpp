@@ -6,36 +6,28 @@
 namespace panorama
 {
 
-    namespace
+    std::vector<cv::Mat>
+    buildAbsoluteHomographies(const std::vector<cv::Mat>& pairwiseH, int ref)
     {
-        std::vector<cv::Mat>
-        buildAbsoluteHomographies(const std::vector<cv::Mat>& pairwiseH,
-                                  int ref)
-        {
-            int n = static_cast<int>(pairwiseH.size()) + 1;
-            std::vector<cv::Mat> absH(n);
-            absH[ref] = cv::Mat::eye(3, 3, CV_64F);
+        int n = static_cast<int>(pairwiseH.size()) + 1;
+        std::vector<cv::Mat> absH(n);
+        absH[ref] = cv::Mat::eye(3, 3, CV_64F);
 
-            for (int i = ref - 1; i >= 0; --i)
-                absH[i] = absH[i + 1] * pairwiseH[i].inv();
+        for (int i = ref - 1; i >= 0; --i)
+            absH[i] = absH[i + 1] * pairwiseH[i].inv();
 
-            for (int i = ref + 1; i < n; ++i)
-                absH[i] = absH[i - 1] * pairwiseH[i - 1];
+        for (int i = ref + 1; i < n; ++i)
+            absH[i] = absH[i - 1] * pairwiseH[i - 1];
 
-            return absH;
-        }
-    } // namespace
+        return absH;
+    }
 
     PipelineResult runPipeline(const std::vector<fs::path>& inputPaths,
                                const fs::path& outputPath)
     {
         std::vector<cv::Mat> images = loadImages(inputPaths);
         const int n = static_cast<int>(images.size());
-        if (n < 2)
-            throw std::runtime_error(
-                "runPipeline: il faut au moins deux images");
 
-        // features de chaque image, calculees une seule fois
         std::vector<Features> features;
         features.reserve(n);
         for (const auto& img : images)
